@@ -1,0 +1,24 @@
+# Render blueprint. Most PaaS platforms want the same four things: a repo, a
+# Dockerfile, environment variables, and a health check path.
+services:
+  - type: web
+    name: prompt-optimizer-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      # The platform assigns PORT itself. The Dockerfile's shell form CMD is
+      # what lets the app actually hear about it.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: prompt-optimizer-db
+          property: connectionString
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: MODEL
+        value: gpt-4o-mini
+
+databases:
+  - name: prompt-optimizer-db
+    databaseName: optimizer
+    user: appuser
